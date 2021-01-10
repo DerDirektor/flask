@@ -20,8 +20,15 @@ def index():
 
 @app.route('/global', methods = ['POST','GET'])
 def global_site():
+    kw ='1'
     if request.method == 'POST':
-        name = request.form ['name']
+        kw = request.form ['KW']
+    else:
+        kw = request.args.get('KW')
+
+    return " Es ist die " + kw +". Kalenderwoche"
+
+
 
 if __name__ == '__main__':
     app.run(port=1337,  debug= True)
