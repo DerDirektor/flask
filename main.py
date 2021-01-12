@@ -1,6 +1,8 @@
-from flask import Flask, url_for, request, render_template, redirect,flash
+from flask import Flask, url_for, request, render_template, redirect, jsonify
 from werkzeug.utils import secure_filename
+import werkzeug
 import os
+import json #json empfangne
 
 app = Flask(__name__)
 folder = r"C:\Users\Administrator\PycharmProjects\flask"  #os und redirect
@@ -17,38 +19,23 @@ def allowed(filename):
 
 @app.route('/', methods =['POST', 'GET'])
 def index():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No File')
-            return redirect(request.url)  # wenn keineDatei hochgeladen wird, dann wird zur zurückgeletut
-        file = request.files['file']
-        if file.filename =='':
-            return redirect(request.url) # wenn filename leer
-        if allowed(file.filname):
-            filename = secure_filename(file.filname) # wenn file ja, und Endung stimmt
-            file.save(os.path.join(folder, filename))
-            return redirect(request.url)
-
-    return '''
-        <h1>Lade</h1>
-        <form methode =post enctype= multipart/form-data>
-        <input type=file name=file>
-        <input type=submit value= hochladen>
-    '''
+    return "SSL"
 
 
+@app.route('/logging/')
+def loog():
+    app.logger.info('Hier ist ein loog')# zum aktivitäten loog
+    return "SSL"
 
-@app.route('/global', methods = ['POST','GET'])
-def global_site():
-    kw ='1'
-    if request.method == 'POST':
-        kw = request.form ['KW']
-    else:
-        kw = request.args.get('KW')
+@app.route('/postme/', methods=['POST'])
+def postme():
+        postedjson = json.loads(request.data.decode('uft-8')) # jsondaten ausleden actung hier entsteht ein string
+        print(postedjson)
+        return ('passt')
 
-    return " Es ist die " + kw +". Kalenderwoche"
-
-
+@app.errorhandler(werkzeug.exceptions.NotFound)
+def notfound(e):
+    return jsonify (error=str(e)), e.code
 
 if __name__ == '__main__':
-    app.run(port=1337,  debug= True)
+    app.run(port=1337,  debug= True, threaded = True)
